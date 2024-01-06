@@ -1,59 +1,64 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>賓果對獎</title>
-	<link type="text/css" rel="stylesheet" href="normalize.css"/>
-	<link type="text/css" rel="stylesheet" href="bingo.css"/>
+	<link type="text/css" rel="stylesheet" href="normalize.css" />
+	<link type="text/css" rel="stylesheet" href="bingo.css" />
 	<script type="text/javascript" src="bingo.js"></script>
-	<meta name="viewport" id="viewport" content="width=490, height=device-height, minimum-scale=0.1, maximum-scale=1.0, user-scalable=0"
-</head>
+	<meta name="viewport" id="viewport"
+		content="width=490, height=device-height, minimum-scale=0.1, maximum-scale=1.0, user-scalable=0" </head>
+
 <body>
-
-<div id='root'>
-	<button class = 'okButton' onclick='addCard()'>新增卡片</button>
-	<button class = 'delAllButton' onclick='clearCard()'>刪除所有卡片</button>
-	<hr>
-</div>
-<div id='home'></div>
-
+	<img id='root'>
+	<button class='okButton' onclick='addCard()'>新增卡片</button>
+	<button class='delAllButton' onclick='clearCard()'>刪除所有卡片</button>
+	
+	</div>
+	<div id='home'></div>
+	<footer class="footer">
+		<img src="./ATEN-02.jpg" class='aten'>
+	</footer>
 </body>
 <script>
-homeDiv = document.getElementById('home');
-rootDiv = document.getElementById('root');
+	homeDiv = document.getElementById('home');
+	rootDiv = document.getElementById('root');
 
-window.onbeforeunload = window.onload = function(){
-	document.documentElement.scrollTop  = 0;
-    document.body.scrollTop  = 0;
-}
-
-newCard = false;
-
-var cards = [];
-
-function loadCard(){
-	readCardsFromLocal();
-
-	if(cards.length > 0){
-		createBingoBall();
-		createBingoCard();
+	window.onbeforeunload = window.onload = function () {
+		document.documentElement.scrollTop = 0;
+		document.body.scrollTop = 0;
 	}
-}
 
-function saveCard(){
-	saveCardToLocal();
-}
+	newCard = false;
 
-function clearCard(){
+	var cards = [];
 
-	var answer = confirm ('吃飽稱著 ?');
-	if (answer){
-		setData("CARDS", "");
+	function loadCard() {
+		readCardsFromLocal();
 
-		location.reload();
+		if (cards.length > 0) {
+			createBingoBall();
+			createBingoCard();
+		}
 	}
-}
 
-loadCard();
+	function saveCard() {
+		saveCardToLocal();
+	}
+
+	function clearCard() {
+
+		var answer = confirm('吃飽稱著 ?');
+		if (answer) {
+			setData("CARDS", "");
+
+			location.reload();
+		}
+	}
+
+	loadCard();
 </script>
+
 </html>

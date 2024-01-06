@@ -3,7 +3,7 @@ body{
 }
 
 .bingoBtn{
-	color:black;
+	color: black;
 	margin: 0px;
 	width : 45px;
 	height: 45px;
@@ -161,18 +161,43 @@ body{
 
 }
 
-.okButton{
+.okButton {
 	width: 200px;
-	height:50px;
-	background-color:#8080f0;
-	font-size:25px;
+	height: 50px;
+	background-color: #8080f0;
+	font-size: 25px;
+	position: fixed;
+	left: 0;
+	top: 0;
 }
-.delAllButton{
-	width: 90px;
-	height:25px;
-	background-color:#f08080;
-	font-size:12px;
-	position:absolute;
-	top:20px;
-	right: 5px;
+
+.delAllButton {
+    width: 90px;
+    height: 50px;
+    background-color: #f08080;
+    font-size: 12px;
+    position: fixed;
+    right: 5px;
+    top: 0;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: right;
+}
+
+.footer img {
+    margin: auto;
+}
+
+.aten {
+    width: 15%;
+    height: auto;
+
+}
+
+#home {
+	padding-top: 60px;
 }
