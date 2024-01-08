@@ -147,7 +147,7 @@ function checkBingoLine(card){
 		}
 
 		setTimeout(function(){
-			alert("！！！賓果 記得請Try喝飲料！！！");
+			alert("！！！賓果！！！\n記得請Try喝飲料!");
 		}, 500);
 	} else 	{
 		card.rootNode.className = 'cardContainer';
