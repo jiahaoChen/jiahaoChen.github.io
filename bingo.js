@@ -1,6 +1,6 @@
 
 var bingoStart = 1;
-var bingoEnd = 75;
+var bingoEnd = 70;
 
 
 function btnClick(){
@@ -232,7 +232,7 @@ function createNewBingoCard() {
 	newCard.value = [
 		['', '', '', '', ''],
 		['', '', '', '', ''],
-		['', '', 'free', '', ''],
+		['', '', '', '', ''],
 		['', '', '', '', ''],
 		['', '', '', '', '']
 	];
@@ -282,7 +282,7 @@ function createNewBingoCard() {
 	cardContainer.appendChild(delButton);
 
 	cardTitle.focus();
-	
+
 	try{
 		cardTitle.setSelectionRange(0, 4);
 	}catch(e){
