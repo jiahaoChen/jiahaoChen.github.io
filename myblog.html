@@ -482,35 +482,6 @@
                 nodeMinHeight: 16,
                 paddingX: 8,
                 autoFit: true,
-                color: (node) => {
-                    // Define a vibrant color palette
-                    const colors = [
-                        '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD',
-                        '#D4A5A5', '#9B5DE5', '#F15BB5', '#00BBF9', '#00F5D4',
-                        '#FFB86C', '#50FA7B', '#FF79C6', '#BD93F9', '#8BE9FD'
-                    ];
-                    
-                    // Use a hash of the node's text to generate a consistent random color
-                    const text = node.content?.toString() || '';
-                    const hash = text.split('').reduce((acc, char) => {
-                        return char.charCodeAt(0) + ((acc << 5) - acc);
-                    }, 0);
-                    const index = Math.abs(hash) % colors.length;
-                    return colors[index];
-                },
-                linkShape: 'diagonal',
-                linkColor: 'rgba(100, 100, 100, 0.3)', // Use a consistent semi-transparent color for links
-                paddingY: 20,
-                fontSize: (node) => {
-                    const sizes = [20, 16, 14, 12];
-                    const depth = node.depth ?? 0;
-                    return sizes[Math.min(depth, sizes.length - 1)];
-                },
-                nodeFont: (node) => {
-                    const darkMode = document.body.classList.contains('dark-theme');
-                    const textColor = darkMode ? '#ffffff' : '#000000'; // White for dark mode, black for light mode
-                    return `16px sans-serif; fill: ${textColor}`; // Include `fill` to set the text color
-                }
             });
             
 
