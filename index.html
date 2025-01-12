@@ -4,9 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leighton Chen - Profile</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 384 512'><path fill='%23ffd700' d='M0 256L28.5 28c2-16 15.6-28 31.8-28H228.9c15 0 27.1 12.1 27.1 27.1c0 3.2-.6 6.5-1.7 9.5L208 160H347.3c16.8 0 30.4 13.6 30.4 30.4c0 3.6-.6 7.1-1.8 10.4l-96 224c-5.1 12-16.9 19.7-29.9 19.7H32c-18.8 0-32-16-32-32V256z'/></svg>">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <style>
+        /* Navigation Styles */
+        .nav-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #007bff;
+        }
+
+        /* Particles Background */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-color: #f8f9fa;
+        }
+
+        /* Adjust container padding for fixed navbar */
+        .container {
+            padding-top: 80px;
+            scroll-padding-top: 80px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+
         .profile-placeholder {
             background-color: #e0e0e0;
             width: 200px;
@@ -18,11 +87,377 @@
             color: #666;
             font-size: 3em;
         }
+
+        /* Animation keyframes */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInFromLeft {
+            from {
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Apply animations */
+        .profile-card {
+            animation: scaleIn 0.8s ease-out;
+        }
+
+        .about-me {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .skill-card {
+            animation: fadeInUp 0.8s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .skill-card:nth-child(1) { animation-delay: 0.1s; }
+        .skill-card:nth-child(2) { animation-delay: 0.3s; }
+        .skill-card:nth-child(3) { animation-delay: 0.5s; }
+        .skill-card:nth-child(4) { animation-delay: 0.7s; }
+
+        .publication-card {
+            animation: slideInFromLeft 0.8s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .publication-card:nth-child(1) { animation-delay: 0.2s; }
+        .publication-card:nth-child(2) { animation-delay: 0.4s; }
+        .publication-card:nth-child(3) { animation-delay: 0.6s; }
+
+        /* Hover animations */
+        .skill-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .profile-photo {
+            transition: transform 0.5s ease;
+        }
+
+        .profile-photo:hover {
+            transform: scale(1.05);
+        }
+
+        .learn-more {
+            transition: all 0.3s ease;
+        }
+
+        .learn-more:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Dark mode styles */
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: #333;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            color: #007bff;
+        }
+
+        /* Dark theme */
+        body.dark-theme {
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+
+        body.dark-theme .nav-container {
+            background: rgba(26, 26, 26, 0.95);
+        }
+
+        body.dark-theme .nav-logo,
+        body.dark-theme .nav-links a {
+            color: #fff;
+        }
+
+        body.dark-theme .theme-toggle {
+            color: #fff;
+        }
+
+        body.dark-theme .skill-card,
+        body.dark-theme .publication-card {
+            background-color: #2d2d2d;
+            color: #fff;
+        }
+
+        body.dark-theme #particles-js {
+            background-color: #1a1a1a;
+        }
+
+        .projects-section {
+            padding: 4rem 0;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .project-image {
+            font-size: 3rem;
+            color: #007bff;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .project-tech span {
+            background: #f0f0f0;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Dark theme support for projects */
+        body.dark-theme .project-card {
+            background: #2d2d2d;
+            color: #fff;
+        }
+
+        body.dark-theme .project-tech span {
+            background: #404040;
+            color: #ddd;
+        }
+
+        /* Contact section styles and dark mode */
+        .contact-info {
+            padding: 2rem;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .contact-info p {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            color: #333;
+            transition: color 0.3s ease;
+        }
+
+        .contact-info i {
+            color: #007bff;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .contact-info a {
+            color: #007bff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .contact-info a:hover {
+            color: #0056b3;
+        }
+
+        /* Dark theme for contact section */
+        body.dark-theme .contact-info {
+            background-color: #2d2d2d;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-theme .contact-info p {
+            color: #fff;
+        }
+
+        body.dark-theme .contact-info i {
+            color: #3b9dff;
+        }
+
+        body.dark-theme .contact-info a {
+            color: #3b9dff;
+        }
+
+        body.dark-theme .contact-info a:hover {
+            color: #66b5ff;
+        }
+
+        /* Dark theme for section titles */
+        body.dark-theme .section-title {
+            color: #fff;
+        }
+
+        /* Footer and Contact styles */
+        footer {
+            padding: 4rem 0;
+            background: white;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Dark theme for footer */
+        body.dark-theme footer {
+            background: #1a1a1a;
+        }
+
+        body.dark-theme footer .section-title {
+            color: #fff;
+        }
+
+        /* Contact section styles and dark mode */
+        .contact-info {
+            padding: 2rem;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .contact-info p {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            color: #333;
+            transition: color 0.3s ease;
+        }
+
+        .contact-info i {
+            color: #007bff;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .contact-info a {
+            color: #007bff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .contact-info a:hover {
+            color: #0056b3;
+        }
+
+        /* Dark theme for contact section */
+        body.dark-theme .contact-info {
+            background-color: #2d2d2d;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-theme .contact-info p {
+            color: #fff;
+        }
+
+        body.dark-theme .contact-info i {
+            color: #3b9dff;
+        }
+
+        body.dark-theme .contact-info a {
+            color: #3b9dff;
+        }
+
+        body.dark-theme .contact-info a:hover {
+            color: #66b5ff;
+        }
+
+        /* Add blog link styles */
+        .blog-link {
+            margin-left: 1rem;
+            padding: 0.5rem 1rem;
+            background: #007bff;
+            color: white !important;
+            border-radius: 20px;
+            transition: all 0.3s ease !important;
+        }
+
+        .blog-link:hover {
+            background: #0056b3;
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        body.dark-theme .blog-link {
+            background: #3b9dff;
+        }
+
+        body.dark-theme .blog-link:hover {
+            background: #66b5ff;
+        }
     </style>
 </head>
 <body>
+    <div id="particles-js"></div>
+    <nav class="nav-container">
+        <div class="navbar">
+            <a href="#" class="nav-logo">LC</a>
+            <div class="nav-links">
+                <a href="#about">About</a>
+                <a href="#skills">Skills</a>
+                <a href="#projects">Projects</a>
+                <a href="#publications">Publications</a>
+                <a href="#contact">Contact</a>
+                <button id="theme-toggle" class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a href="blog.html" class="blog-link">Blog <i class="fas fa-external-link-alt"></i></a>
+            </div>
+        </div>
+    </nav>
     <div class="container">
-        <section class="about-me">
+        <section id="about" class="about-me">
             <h2 class="section-title">A BIT ABOUT ME</h2>
             <h1 class="main-title">Who Am I?</h1>
             <p class="bio">
@@ -46,8 +481,8 @@
                 </div>
             </div>
         </section>
-
-        <section class="skills-grid">
+        <h2>SKILLS</h2>
+        <section id="skills" class="skills-grid">
             <div class="skill-card">
                 <i class="fas fa-microchip"></i>
                 <h3>EMBEDDED SYSTEMS</h3>
@@ -109,7 +544,55 @@
             </div>
         </section>
 
-        <section class="publications">
+        <section id="projects" class="projects-section">
+            <h2>PROJECTS</h2>
+            <h2 class="section-title">FEATURED PROJECTS</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <div class="project-image">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>Video Distribution System</h3>
+                    <p>Developed a scalable video distribution system handling 1000+ concurrent connections with real-time transcoding capabilities.</p>
+                    <div class="project-tech">
+                        <span>C++</span>
+                        <span>GStreamer</span>
+                        <span>Linux</span>
+                        <span>Python</span>
+                        <span>ReactJs</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-image">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <h3>KVM Over IP Solution</h3>
+                    <p>Led the development of a KVM over IP solution enabling remote computer control with ultra-low latency.</p>
+                    <div class="project-tech">
+                        <span>Embedded Linux</span>
+                        <span>Gstreamer</span>
+                        <span>Network Protocol</span>
+                        <span>ZeroMQ</span>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-image">
+                        <i class="fas fa-chalkboard"></i>
+                    </div>
+                    <h3>AI Meeting System</h3>
+                    <p>Architected a cloud-based device management platform for remote monitoring and control.</p>
+                    <div class="project-tech">
+                        <span>FastAPI</span>
+                        <span>Azure ASR</span>
+                        <span>PyQT</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="publications" class="publications">
             <h2>Publications</h2>
             
             <div class="publications-section">
@@ -156,5 +639,73 @@
         </footer>
     </div>
     <script src="script.js"></script>
+    <script>
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: '#007bff' },
+                shape: { type: 'circle' },
+                opacity: { value: 0.5, random: false },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: '#007bff',
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: 'none',
+                    random: false,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: {
+                    onhover: { enable: true, mode: 'grab' },
+                    onclick: { enable: true, mode: 'push' },
+                    resize: true
+                },
+                modes: {
+                    grab: { distance: 140, line_linked: { opacity: 1 } },
+                    push: { particles_nb: 4 }
+                }
+            },
+            retina_detect: true
+        });
+
+        // Theme persistence functionality
+        function setTheme(isDark) {
+            if (isDark) {
+                document.body.classList.add('dark-theme');
+                document.querySelector('.theme-toggle i').classList.remove('fa-moon');
+                document.querySelector('.theme-toggle i').classList.add('fa-sun');
+            } else {
+                document.body.classList.remove('dark-theme');
+                document.querySelector('.theme-toggle i').classList.remove('fa-sun');
+                document.querySelector('.theme-toggle i').classList.add('fa-moon');
+            }
+            localStorage.setItem('darkMode', isDark);
+        }
+
+        // Load saved theme preference
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedDarkMode = localStorage.getItem('darkMode');
+            // Set dark mode as default if no preference is saved
+            const darkMode = savedDarkMode === null ? true : savedDarkMode === 'true';
+            setTheme(darkMode);
+        });
+
+        // Dark mode toggle functionality
+        document.getElementById('theme-toggle').addEventListener('click', function() {
+            const isDark = !document.body.classList.contains('dark-theme');
+            setTheme(isDark);
+        });
+    </script>
 </body>
 </html>

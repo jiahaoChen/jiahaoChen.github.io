@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leighton Chen - Blog</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 384 512'><path fill='%23ffd700' d='M0 256L28.5 28c2-16 15.6-28 31.8-28H228.9c15 0 27.1 12.1 27.1 27.1c0 3.2-.6 6.5-1.7 9.5L208 160H347.3c16.8 0 30.4 13.6 30.4 30.4c0 3.6-.6 7.1-1.8 10.4l-96 224c-5.1 12-16.9 19.7-29.9 19.7H32c-18.8 0-32-16-32-32V256z'/></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Add Markmap dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markmap-view"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.15.4"></script>
+    <!-- Add marked with highlight.js for better markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Dark theme */
+        body.dark-theme {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            padding: 0.8rem 1.5rem;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .blog-container {
+            max-width: 800px;
+            margin: 80px auto 40px;
+            padding: 0 20px;
+        }
+
+        .blog-post {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-theme .blog-post {
+            background: #2d2d2d;
+            color: #fff;
+        }
+
+        .blog-post:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .blog-post h2 {
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .blog-meta {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .blog-meta {
+            color: #aaa;
+        }
+
+        .blog-meta i {
+            color: #007bff;
+        }
+
+        body.dark-theme .blog-meta i {
+            color: #3b9dff;
+        }
+
+        .blog-content {
+            line-height: 1.6;
+            color: #444;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-theme .blog-content {
+            color: #ddd;
+        }
+
+        .read-more {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .read-more:hover {
+            color: #0056b3;
+        }
+
+        body.dark-theme .read-more {
+            color: #3b9dff;
+        }
+
+        body.dark-theme .read-more:hover {
+            color: #66b5ff;
+        }
+
+        .mindmap-container {
+            width: 100%;
+            height: 600px;
+            margin: 20px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-theme .mindmap-container {
+            background: #2d2d2d;
+        }
+
+        .mindmap-container svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Add styles for markdown content */
+        .markdown-content {
+            padding: 20px;
+        }
+
+        .markdown-content h1,
+        .markdown-content h2,
+        .markdown-content h3,
+        .markdown-content h4,
+        .markdown-content h5,
+        .markdown-content h6 {
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            line-height: 1.25;
+        }
+
+        .markdown-content h1 {
+            font-size: 2em;
+            border-bottom: 1px solid #eaecef;
+            padding-bottom: .3em;
+        }
+
+        .markdown-content h2 {
+            font-size: 1.5em;
+            border-bottom: 1px solid #eaecef;
+            padding-bottom: .3em;
+        }
+
+        .markdown-content p {
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .markdown-content code {
+            padding: .2em .4em;
+            margin: 0;
+            font-size: 85%;
+            background-color: rgba(27,31,35,.05);
+            border-radius: 6px;
+            font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
+        }
+
+        .markdown-content pre code {
+            padding: 16px;
+            display: block;
+            overflow-x: auto;
+        }
+
+        body.dark-theme .markdown-content code {
+            background-color: rgba(200,200,200,.1);
+        }
+
+        .markdown-content img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .markdown-content blockquote {
+            padding: 0 1em;
+            color: #6a737d;
+            border-left: .25em solid #dfe2e5;
+            margin: 0 0 16px;
+        }
+
+        body.dark-theme .markdown-content blockquote {
+            color: #9da5af;
+            border-left-color: #4a4a4a;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to Home
+    </a>
+
+    <div class="blog-container" id="blog-posts">
+        <!-- Blog posts will be dynamically inserted here -->
+    </div>
+
+    <script>
+        // Configure marked with highlight.js
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    return hljs.highlight(code, { language: lang }).value;
+                }
+                return hljs.highlightAuto(code).value;
+            },
+            breaks: true,
+            gfm: true,
+            headerIds: true,
+            mangle: false,
+            pedantic: false,
+            sanitize: false,
+            smartLists: true,
+            smartypants: true
+        });
+
+        // Function to check if content is a mindmap
+        function isMindmap(content) {
+            // Check if the content has specific mindmap indicators
+            return content.trim().toLowerCase().startsWith('# mindmap') || 
+                   content.includes('<!--mindmap-->');
+        }
+
+        // Function to render mindmap
+        async function renderMindmap(markdown, container) {
+            const { Markmap, loadCSS, loadJS } = window.markmap;
+            
+            // Create mindmap container
+            const mindmapDiv = document.createElement('div');
+            mindmapDiv.className = 'mindmap-container';
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            mindmapDiv.appendChild(svg);
+            container.appendChild(mindmapDiv);
+
+            // Remove the mindmap indicator before rendering
+            const cleanMarkdown = markdown.replace(/^# mindmap\n/, '').replace('<!--mindmap-->', '');
+
+            // Create markmap instance
+            const mm = Markmap.create(svg, {
+                embedGlobalCSS: true,
+                color: (node) => {
+                    const darkMode = document.body.classList.contains('dark-theme');
+                    return darkMode ? '#fff' : '#000';
+                }
+            });
+
+            // Transform markdown to mindmap data
+            const transformer = new window.markmap.Transformer();
+            const { root } = await transformer.transform(cleanMarkdown);
+            
+            // Render mindmap
+            mm.setData(root);
+            mm.fit();
+        }
+
+        // Function to render markdown
+        function renderMarkdown(markdown, container) {
+            container.className = 'blog-content markdown-content';
+            
+            // Remove markdown code block markers and get content
+            let content = markdown;
+            if (content.startsWith('```markdown\n')) {
+                content = content.substring('```markdown\n'.length);
+            }
+            if (content.endsWith('\n```')) {
+                content = content.substring(0, content.length - 4);
+            }
+            
+            // Remove title from content since we're displaying it separately
+            const contentWithoutTitle = content.replace(/^#\s+([^\n]+)\n/, '');
+            
+            // Use marked to render the markdown directly without extra cleaning
+            container.innerHTML = marked.parse(contentWithoutTitle);
+            
+            // Initialize highlight.js on code blocks
+            container.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+        }
+
+        // Function to fetch and parse markdown files
+        async function loadBlogPosts() {
+            try {
+                // First, fetch the list of files from the blog directory
+                const blogContainer = document.getElementById('blog-posts');
+                
+                // Use fetch to get the directory listing
+                const response = await fetch('blog/');
+                const text = await response.text();
+                
+                // Create a temporary element to parse the HTML response
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, 'text/html');
+                
+                // Get all links that end with .md
+                const markdownFiles = Array.from(doc.querySelectorAll('a'))
+                    .filter(a => a.href.endsWith('.md'))
+                    .map(a => a.href.split('/').pop());
+
+                for (const fileName of markdownFiles) {
+                    try {
+                        // Fetch each markdown file
+                        const response = await fetch(`blog/${fileName}`);
+                        const markdown = await response.text();
+                        
+                        // Create blog post element
+                        const blogPost = document.createElement('div');
+                        blogPost.className = 'blog-post';
+                        
+                        // Get the title from the first h1 or use filename
+                        const titleMatch = markdown.match(/^#\s+(.+)$/m);
+                        const title = titleMatch ? titleMatch[1] : fileName.replace('.md', '');
+                        
+                        // Extract date from file name or metadata if available
+                        // For now, using current date as fallback
+                        const date = new Date().toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                        
+                        // Add header
+                        blogPost.innerHTML = `
+                            <h2>${title}</h2>
+                            <div class="blog-meta">
+                                <span><i class="far fa-calendar"></i> ${date}</span>
+                                <span><i class="far fa-folder"></i> Blog</span>
+                            </div>
+                            <div class="blog-content"></div>
+                        `;
+                        
+                        const contentDiv = blogPost.querySelector('.blog-content');
+                        
+                        if (isMindmap(markdown)) {
+                            // Render as mindmap
+                            await renderMindmap(markdown, contentDiv);
+                        } else {
+                            // Render as markdown
+                            renderMarkdown(markdown, contentDiv);
+                        }
+                        
+                        blogContainer.appendChild(blogPost);
+                    } catch (error) {
+                        console.error(`Error loading post ${fileName}:`, error);
+                    }
+                }
+
+                if (markdownFiles.length === 0) {
+                    blogContainer.innerHTML = '<div class="blog-post"><p>No blog posts found.</p></div>';
+                }
+            } catch (error) {
+                console.error('Error loading blog posts:', error);
+                const blogContainer = document.getElementById('blog-posts');
+                blogContainer.innerHTML = '<div class="blog-post"><p>Error loading blog posts. Please try again later.</p></div>';
+            }
+        }
+
+        // Load saved theme preference
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedDarkMode = localStorage.getItem('darkMode');
+            // Set dark mode as default if no preference is saved
+            const darkMode = savedDarkMode === null ? true : savedDarkMode === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-theme');
+            }
+            
+            // Load blog posts
+            loadBlogPosts();
+        });
+    </script>
+</body>
+</html> 
