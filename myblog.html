@@ -519,30 +519,18 @@
         async function loadBlogPosts() {
             try {
                 const blogContainer = document.getElementById('blog-posts');
-                const response = await fetch('blog/');
-                const text = await response.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(text, 'text/html');
                 
-                // Get all markdown files and their stats
-                const markdownFiles = Array.from(doc.querySelectorAll('a'))
-                    .filter(a => a.href.endsWith('.md'))
-                    .map(a => {
-                        // Get the date from the next sibling text node or use current date as fallback
-                        const dateText = a.closest('tr')?.querySelector('td:nth-child(3)')?.textContent || new Date().toISOString();
-                        return {
-                            name: a.href.split('/').pop(),
-                            date: new Date(dateText)
-                        };
-                    });
+                // Fetch the blog posts metadata
+                const response = await fetch('blog-posts.json');
+                const data = await response.json();
+                
+                // Sort posts by date (newest first)
+                const posts = data.posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-                // Sort by creation time (newest first)
-                markdownFiles.sort((a, b) => b.date - a.date);
-
-                for (const fileInfo of markdownFiles) {
+                for (const post of posts) {
                     try {
                         // Fetch each markdown file
-                        const response = await fetch(`blog/${fileInfo.name}`);
+                        const response = await fetch(`blog/${post.filename}`);
                         let markdown = await response.text();
                         
                         // Remove markdown code block markers if they exist
@@ -554,14 +542,14 @@
                         
                         // Get the title from the first h1 or use filename
                         const titleMatch = markdown.match(/^#\s+(.+)$/m);
-                        const title = titleMatch ? titleMatch[1] : fileInfo.name.replace('.md', '');
+                        const title = titleMatch ? titleMatch[1] : post.title;
                         
                         // Get the summary from ONE SENTENCE SUMMARY section
                         const summaryMatch = markdown.match(/## ONE SENTENCE SUMMARY:\s*\n([^\n]+)/);
                         const summary = summaryMatch ? summaryMatch[1].trim() : 'No summary available.';
                         
                         // Format the date
-                        const date = fileInfo.date.toLocaleDateString('en-US', {
+                        const date = new Date(post.date).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric'
@@ -653,11 +641,11 @@
                         
                         blogContainer.appendChild(blogPost);
                     } catch (error) {
-                        console.error(`Error loading post ${fileInfo.name}:`, error);
+                        console.error(`Error loading post ${post.filename}:`, error);
                     }
                 }
 
-                if (markdownFiles.length === 0) {
+                if (posts.length === 0) {
                     blogContainer.innerHTML = '<div class="blog-post"><p>No blog posts found.</p></div>';
                 }
             } catch (error) {

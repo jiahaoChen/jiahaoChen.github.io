@@ -697,7 +697,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const savedDarkMode = localStorage.getItem('darkMode');
             // Set dark mode as default if no preference is saved
-            const darkMode = savedDarkMode === null ? true : savedDarkMode === 'true';
+            const darkMode = savedDarkMode === null ? true : savedDarkMode === 'false';
             setTheme(darkMode);
         });
 
