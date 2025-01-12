@@ -1,4 +1,3 @@
-```markdown
 # How to Price Your AI Services as a Beginner
 ### Date Analyzed: 2024-10-11
 <iframe width="560" height="315" src="https://www.youtube.com/embed/JSmGZ8vTEFQ" frameborder="0" allowfullscreen></iframe>
@@ -43,4 +42,3 @@ This video explains essential pricing strategies for AI services, helping beginn
 ## Recap and Next Steps
 ### Key takeaways
 ### Scaling your AI business
-```

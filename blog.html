@@ -45,6 +45,32 @@
             font-weight: 500;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 0.8rem 1.5rem;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .back-button:hover {
@@ -113,6 +139,59 @@
 
         body.dark-theme .blog-content {
             color: #ddd;
+        }
+
+        .blog-content.collapsed .markdown-content {
+            display: none;
+        }
+
+        .blog-content.collapsed .mindmap-wrapper {
+            display: none;
+        }
+
+        .blog-content .summary {
+            margin-bottom: 1rem;
+            font-style: italic;
+            color: #666;
+        }
+
+        body.dark-theme .blog-content .summary {
+            color: #aaa;
+        }
+
+        .toggle-content {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 15px;
+            cursor: pointer;
+            border: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-content:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .blog-content.collapsed .show-more {
+            display: inline-block;
+        }
+
+        .blog-content.collapsed .show-less {
+            display: none;
+        }
+
+        .blog-content:not(.collapsed) .show-more {
+            display: none;
+        }
+
+        .blog-content:not(.collapsed) .show-less {
+            display: inline-block;
         }
 
         .read-more {
@@ -224,15 +303,117 @@
             color: #9da5af;
             border-left-color: #4a4a4a;
         }
+
+        /* Mindmap styles */
+        .mindmap-container text,
+        .mindmap-container g text {
+            fill: #000;
+            font-family: sans-serif;
+        }
+
+        body.dark-theme .mindmap-container text,
+        body.dark-theme .mindmap-container g text {
+            fill: #fff !important;
+        }
+
+        /* Add styles for mindmap links in dark mode */
+        body.dark-theme .mindmap-container path {
+            stroke-opacity: 0.3;
+            stroke: #fff;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            width: 95%;
+            height: 95%;
+            margin: auto;
+            background: white;
+            border-radius: 10px;
+            position: relative;
+            padding: 20px;
+        }
+
+        body.dark-theme .modal-content {
+            background: #2d2d2d;
+        }
+
+        .modal .mindmap-container {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            z-index: 2001;
+        }
+
+        .close-modal:hover {
+            background: #0056b3;
+            transform: scale(1.1);
+        }
+
+        .mindmap-wrapper {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .mindmap-wrapper:hover {
+            transform: scale(1.02);
+        }
     </style>
 </head>
 <body>
     <a href="index.html" class="back-button">
         <i class="fas fa-arrow-left"></i> Back to Home
     </a>
+    <button class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </button>
 
     <div class="blog-container" id="blog-posts">
         <!-- Blog posts will be dynamically inserted here -->
+    </div>
+
+    <div class="modal" id="mindmap-modal">
+        <button class="close-modal" onclick="closeModal()">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="modal-content">
+            <!-- Modal mindmap will be inserted here -->
+        </div>
     </div>
 
     <script>
@@ -262,26 +443,31 @@
         }
 
         // Function to render mindmap
-        async function renderMindmap(markdown, container) {
+        async function renderMindmap(markdown, container, isModal = false) {
             const { Markmap, loadCSS, loadJS } = window.markmap;
             
             // Create mindmap container with fixed dimensions
             const mindmapDiv = document.createElement('div');
             mindmapDiv.className = 'mindmap-container';
             mindmapDiv.style.width = '100%';
-            mindmapDiv.style.height = '500px';
-            mindmapDiv.style.margin = '20px 0';
+            mindmapDiv.style.height = isModal ? '100%' : '500px';
+            mindmapDiv.style.margin = isModal ? '0' : '20px 0';
             
             // Create and configure SVG element
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.style.width = '100%';
             svg.style.height = '100%';
             svg.setAttribute('width', '800');
-            svg.setAttribute('height', '500');
-            svg.setAttribute('viewBox', '0 0 800 500');
+            svg.setAttribute('height', isModal ? '800' : '500');
+            svg.setAttribute('viewBox', '0 0 800 800');
             
             mindmapDiv.appendChild(svg);
             container.appendChild(mindmapDiv);
+
+            // If not modal, add click handler to open modal
+            if (!isModal) {
+                container.addEventListener('click', () => openModal(markdown));
+            }
 
             // Remove the mindmap indicator and clean markdown
             const cleanMarkdown = markdown
@@ -297,10 +483,36 @@
                 paddingX: 8,
                 autoFit: true,
                 color: (node) => {
+                    // Define a vibrant color palette
+                    const colors = [
+                        '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD',
+                        '#D4A5A5', '#9B5DE5', '#F15BB5', '#00BBF9', '#00F5D4',
+                        '#FFB86C', '#50FA7B', '#FF79C6', '#BD93F9', '#8BE9FD'
+                    ];
+                    
+                    // Use a hash of the node's text to generate a consistent random color
+                    const text = node.content?.toString() || '';
+                    const hash = text.split('').reduce((acc, char) => {
+                        return char.charCodeAt(0) + ((acc << 5) - acc);
+                    }, 0);
+                    const index = Math.abs(hash) % colors.length;
+                    return colors[index];
+                },
+                linkShape: 'diagonal',
+                linkColor: 'rgba(100, 100, 100, 0.3)', // Use a consistent semi-transparent color for links
+                paddingY: 20,
+                fontSize: (node) => {
+                    const sizes = [20, 16, 14, 12];
+                    const depth = node.depth ?? 0;
+                    return sizes[Math.min(depth, sizes.length - 1)];
+                },
+                nodeFont: (node) => {
                     const darkMode = document.body.classList.contains('dark-theme');
-                    return darkMode ? '#fff' : '#000';
+                    const textColor = darkMode ? '#ffffff' : '#000000'; // White for dark mode, black for light mode
+                    return `16px sans-serif; fill: ${textColor}`; // Include `fill` to set the text color
                 }
             });
+            
 
             try {
                 // Transform markdown to mindmap data
@@ -320,21 +532,10 @@
 
         // Function to render markdown
         function renderMarkdown(markdown, container) {
-            container.className = 'blog-content markdown-content';
-            
-            // Remove markdown code block markers and get content
-            let content = markdown;
-            if (content.startsWith('```markdown\n')) {
-                content = content.substring('```markdown\n'.length);
-            }
-            if (content.endsWith('\n```')) {
-                content = content.substring(0, content.length - 4);
-            }
-            
             // Remove title from content since we're displaying it separately
-            const contentWithoutTitle = content.replace(/^#\s+([^\n]+)\n/, '');
+            const contentWithoutTitle = markdown.replace(/^#\s+([^\n]+)\n/, '');
             
-            // Use marked to render the markdown directly without extra cleaning
+            // Use marked to render the markdown
             container.innerHTML = marked.parse(contentWithoutTitle);
             
             // Initialize highlight.js on code blocks
@@ -371,7 +572,10 @@
                     try {
                         // Fetch each markdown file
                         const response = await fetch(`blog/${fileInfo.name}`);
-                        const markdown = await response.text();
+                        let markdown = await response.text();
+                        
+                        // Remove markdown code block markers if they exist
+                        markdown = markdown.replace(/^```markdown\s*\n?/, '').replace(/\n?```$/, '');
                         
                         // Create blog post element
                         const blogPost = document.createElement('div');
@@ -381,39 +585,98 @@
                         const titleMatch = markdown.match(/^#\s+(.+)$/m);
                         const title = titleMatch ? titleMatch[1] : fileInfo.name.replace('.md', '');
                         
+                        // Get the summary from ONE SENTENCE SUMMARY section
+                        const summaryMatch = markdown.match(/## ONE SENTENCE SUMMARY:\s*\n([^\n]+)/);
+                        const summary = summaryMatch ? summaryMatch[1].trim() : 'No summary available.';
+                        
                         // Format the date
                         const date = fileInfo.date.toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric'
                         });
-                        
-                        // Add header
-                        blogPost.innerHTML = `
-                            <h2>${title}</h2>
-                            <div class="blog-meta">
-                                <span><i class="far fa-calendar"></i> ${date}</span>
-                                <span><i class="far fa-folder"></i> Blog</span>
-                            </div>
-                            <div class="blog-content"></div>
-                        `;
 
-                        const contentDiv = blogPost.querySelector('.blog-content');
+                        // Create title element
+                        const titleEl = document.createElement('h2');
+                        titleEl.textContent = title;
+                        blogPost.appendChild(titleEl);
+
+                        // Create meta div
+                        const metaDiv = document.createElement('div');
+                        metaDiv.className = 'blog-meta';
+                        
+                        const dateSpan = document.createElement('span');
+                        const dateIcon = document.createElement('i');
+                        dateIcon.className = 'far fa-calendar';
+                        dateSpan.appendChild(dateIcon);
+                        dateSpan.appendChild(document.createTextNode(` ${date}`));
+                        
+                        const categorySpan = document.createElement('span');
+                        const folderIcon = document.createElement('i');
+                        folderIcon.className = 'far fa-folder';
+                        categorySpan.appendChild(folderIcon);
+                        categorySpan.appendChild(document.createTextNode(' Blog'));
+                        
+                        metaDiv.appendChild(dateSpan);
+                        metaDiv.appendChild(categorySpan);
+                        blogPost.appendChild(metaDiv);
+
+                        // Create blog content container
+                        const blogContent = document.createElement('div');
+                        blogContent.className = 'blog-content collapsed';
+
+                        // Create summary
+                        const summaryDiv = document.createElement('div');
+                        summaryDiv.className = 'summary';
+                        summaryDiv.textContent = summary;
+                        blogContent.appendChild(summaryDiv);
+
+                        // Create show more button
+                        const showMoreBtn = document.createElement('button');
+                        showMoreBtn.className = 'toggle-content show-more';
+                        showMoreBtn.textContent = 'Show More';
+                        blogContent.appendChild(showMoreBtn);
+
+                        // Create show less button
+                        const showLessBtn = document.createElement('button');
+                        showLessBtn.className = 'toggle-content show-less';
+                        showLessBtn.textContent = 'Show Less';
+                        blogContent.appendChild(showLessBtn);
+
+                        // Create full content container
+                        const contentDiv = document.createElement('div');
+                        contentDiv.className = 'full-content';
+                        blogContent.appendChild(contentDiv);
+
+                        // Add blog content to post
+                        blogPost.appendChild(blogContent);
+
+                        // Add toggle functionality
+                        showMoreBtn.addEventListener('click', () => {
+                            blogContent.classList.remove('collapsed');
+                        });
+                        
+                        showLessBtn.addEventListener('click', () => {
+                            blogContent.classList.add('collapsed');
+                            blogPost.scrollIntoView({ behavior: 'smooth' });
+                        });
 
                         // Split content at --- if it exists
-                        const [markdownPart, mindmapPart] = markdown.split('---').map(part => part.trim());
-
-                        if (markdownPart) {
+                        const parts = markdown.split('---').map(part => part.trim());
+                        
+                        if (parts[0]) {
                             // Create div for markdown content
                             const markdownDiv = document.createElement('div');
-                            renderMarkdown(markdownPart, markdownDiv);
+                            markdownDiv.className = 'markdown-content';
+                            renderMarkdown(parts[0], markdownDiv);
                             contentDiv.appendChild(markdownDiv);
                         }
 
-                        if (mindmapPart) {
+                        if (parts[1]) {
                             // Create div for mindmap
                             const mindmapDiv = document.createElement('div');
-                            await renderMindmap(mindmapPart, mindmapDiv);
+                            mindmapDiv.className = 'mindmap-wrapper';
+                            await renderMindmap(parts[1], mindmapDiv);
                             contentDiv.appendChild(mindmapDiv);
                         }
                         
@@ -433,14 +696,85 @@
             }
         }
 
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const isDarkMode = body.classList.toggle('dark-theme');
+            const themeToggle = document.getElementById('theme-toggle');
+            const icon = themeToggle.querySelector('i');
+            
+            // Update icon and save preference
+            if (isDarkMode) {
+                icon.className = 'fas fa-sun';
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                icon.className = 'fas fa-moon';
+                localStorage.setItem('darkMode', 'false');
+            }
+
+            // Reload all mindmaps to update their colors
+            document.querySelectorAll('.mindmap-container').forEach(container => {
+                const svg = container.querySelector('svg');
+                if (svg) {
+                    // Force a redraw of the mindmap
+                    svg.style.display = 'none';
+                    setTimeout(() => {
+                        svg.style.display = 'block';
+                    }, 0);
+                }
+            });
+        }
+
+        // Modal functions
+        function openModal(markdown) {
+            const modal = document.getElementById('mindmap-modal');
+            const modalContent = modal.querySelector('.modal-content');
+            
+            // Clear previous content
+            modalContent.innerHTML = '';
+            
+            // Render mindmap in modal
+            renderMindmap(markdown, modalContent, true);
+            
+            // Show modal with animation
+            requestAnimationFrame(() => {
+                modal.classList.add('active');
+            });
+
+            // Add escape key listener
+            document.addEventListener('keydown', handleEscapeKey);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('mindmap-modal');
+            modal.classList.remove('active');
+            
+            // Remove escape key listener
+            document.removeEventListener('keydown', handleEscapeKey);
+        }
+
+        function handleEscapeKey(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        }
+
         // Load saved theme preference
         document.addEventListener('DOMContentLoaded', function() {
             const savedDarkMode = localStorage.getItem('darkMode');
-            // Set dark mode as default if no preference is saved
             const darkMode = savedDarkMode === null ? true : savedDarkMode === 'true';
+            const themeToggle = document.getElementById('theme-toggle');
+            const icon = themeToggle.querySelector('i');
+            
             if (darkMode) {
                 document.body.classList.add('dark-theme');
+                icon.className = 'fas fa-sun';
+            } else {
+                icon.className = 'fas fa-moon';
             }
+            
+            // Add click event listener
+            themeToggle.addEventListener('click', toggleTheme);
             
             // Load blog posts
             loadBlogPosts();
