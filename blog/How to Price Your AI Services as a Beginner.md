@@ -24,7 +24,6 @@ This video explains essential pricing strategies for AI services, helping beginn
 
 ---
 
-# MARKMAP:
 # How to Price Your AI Services as a Beginner
 ## Why Pricing Matters
 ### Importance of effective pricing

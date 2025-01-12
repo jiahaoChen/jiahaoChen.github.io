@@ -265,32 +265,57 @@
         async function renderMindmap(markdown, container) {
             const { Markmap, loadCSS, loadJS } = window.markmap;
             
-            // Create mindmap container
+            // Create mindmap container with fixed dimensions
             const mindmapDiv = document.createElement('div');
             mindmapDiv.className = 'mindmap-container';
+            mindmapDiv.style.width = '100%';
+            mindmapDiv.style.height = '500px';
+            mindmapDiv.style.margin = '20px 0';
+            
+            // Create and configure SVG element
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.style.width = '100%';
+            svg.style.height = '100%';
+            svg.setAttribute('width', '800');
+            svg.setAttribute('height', '500');
+            svg.setAttribute('viewBox', '0 0 800 500');
+            
             mindmapDiv.appendChild(svg);
             container.appendChild(mindmapDiv);
 
-            // Remove the mindmap indicator before rendering
-            const cleanMarkdown = markdown.replace(/^# mindmap\n/, '').replace('<!--mindmap-->', '');
+            // Remove the mindmap indicator and clean markdown
+            const cleanMarkdown = markdown
+                .replace(/^# mindmap\n/, '')
+                .replace('<!--mindmap-->', '')
+                .trim();
 
-            // Create markmap instance
+            // Create markmap instance with specific options
             const mm = Markmap.create(svg, {
                 embedGlobalCSS: true,
+                duration: 0,
+                nodeMinHeight: 16,
+                paddingX: 8,
+                autoFit: true,
                 color: (node) => {
                     const darkMode = document.body.classList.contains('dark-theme');
                     return darkMode ? '#fff' : '#000';
                 }
             });
 
-            // Transform markdown to mindmap data
-            const transformer = new window.markmap.Transformer();
-            const { root } = await transformer.transform(cleanMarkdown);
-            
-            // Render mindmap
-            mm.setData(root);
-            mm.fit();
+            try {
+                // Transform markdown to mindmap data
+                const transformer = new window.markmap.Transformer();
+                const { root } = await transformer.transform(cleanMarkdown);
+                
+                // Set data and fit the view
+                mm.setData(root);
+                setTimeout(() => {
+                    mm.fit(); // Delay fit to ensure proper rendering
+                }, 100);
+            } catch (error) {
+                console.error('Error rendering mindmap:', error);
+                container.innerHTML = '<div class="error">Error rendering mindmap</div>';
+            }
         }
 
         // Function to render markdown
@@ -321,26 +346,31 @@
         // Function to fetch and parse markdown files
         async function loadBlogPosts() {
             try {
-                // First, fetch the list of files from the blog directory
                 const blogContainer = document.getElementById('blog-posts');
-                
-                // Use fetch to get the directory listing
                 const response = await fetch('blog/');
                 const text = await response.text();
-                
-                // Create a temporary element to parse the HTML response
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(text, 'text/html');
                 
-                // Get all links that end with .md
+                // Get all markdown files and their stats
                 const markdownFiles = Array.from(doc.querySelectorAll('a'))
                     .filter(a => a.href.endsWith('.md'))
-                    .map(a => a.href.split('/').pop());
+                    .map(a => {
+                        // Get the date from the next sibling text node or use current date as fallback
+                        const dateText = a.closest('tr')?.querySelector('td:nth-child(3)')?.textContent || new Date().toISOString();
+                        return {
+                            name: a.href.split('/').pop(),
+                            date: new Date(dateText)
+                        };
+                    });
 
-                for (const fileName of markdownFiles) {
+                // Sort by creation time (newest first)
+                markdownFiles.sort((a, b) => b.date - a.date);
+
+                for (const fileInfo of markdownFiles) {
                     try {
                         // Fetch each markdown file
-                        const response = await fetch(`blog/${fileName}`);
+                        const response = await fetch(`blog/${fileInfo.name}`);
                         const markdown = await response.text();
                         
                         // Create blog post element
@@ -349,11 +379,10 @@
                         
                         // Get the title from the first h1 or use filename
                         const titleMatch = markdown.match(/^#\s+(.+)$/m);
-                        const title = titleMatch ? titleMatch[1] : fileName.replace('.md', '');
+                        const title = titleMatch ? titleMatch[1] : fileInfo.name.replace('.md', '');
                         
-                        // Extract date from file name or metadata if available
-                        // For now, using current date as fallback
-                        const date = new Date().toLocaleDateString('en-US', {
+                        // Format the date
+                        const date = fileInfo.date.toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric'
@@ -368,20 +397,29 @@
                             </div>
                             <div class="blog-content"></div>
                         `;
-                        
+
                         const contentDiv = blogPost.querySelector('.blog-content');
-                        
-                        if (isMindmap(markdown)) {
-                            // Render as mindmap
-                            await renderMindmap(markdown, contentDiv);
-                        } else {
-                            // Render as markdown
-                            renderMarkdown(markdown, contentDiv);
+
+                        // Split content at --- if it exists
+                        const [markdownPart, mindmapPart] = markdown.split('---').map(part => part.trim());
+
+                        if (markdownPart) {
+                            // Create div for markdown content
+                            const markdownDiv = document.createElement('div');
+                            renderMarkdown(markdownPart, markdownDiv);
+                            contentDiv.appendChild(markdownDiv);
+                        }
+
+                        if (mindmapPart) {
+                            // Create div for mindmap
+                            const mindmapDiv = document.createElement('div');
+                            await renderMindmap(mindmapPart, mindmapDiv);
+                            contentDiv.appendChild(mindmapDiv);
                         }
                         
                         blogContainer.appendChild(blogPost);
                     } catch (error) {
-                        console.error(`Error loading post ${fileName}:`, error);
+                        console.error(`Error loading post ${fileInfo.name}:`, error);
                     }
                 }
 
