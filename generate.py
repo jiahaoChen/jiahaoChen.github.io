@@ -4,6 +4,7 @@ import re
 import subprocess
 from urllib.parse import urlparse, parse_qs
 import requests
+from generate_blog_metadata import generate_metadata
 
 def clean_youtube_url(url):
     """Clean and validate YouTube URL or video ID"""
@@ -111,3 +112,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    generate_metadata()

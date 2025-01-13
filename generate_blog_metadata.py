@@ -2,7 +2,6 @@ import os
 import json
 from datetime import datetime
 import re
-
 def extract_title_from_markdown(content):
     # Try to get title from H1 header
     title_match = re.search(r'^#\s+(.+)$', content, re.MULTILINE)
@@ -56,6 +55,3 @@ def generate_metadata():
         json.dump(metadata, f, indent=4, ensure_ascii=False)
     
     print(f"Generated metadata for {len(posts)} blog posts")
-
-if __name__ == '__main__':
-    generate_metadata() 
