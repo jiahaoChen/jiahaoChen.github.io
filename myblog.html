@@ -575,9 +575,20 @@
                         folderIcon.className = 'far fa-folder';
                         categorySpan.appendChild(folderIcon);
                         categorySpan.appendChild(document.createTextNode(' Blog'));
+
+                        const clickSpan = document.createElement('span');
+                        const clickIcon = document.createElement('i');
+                        clickIcon.className = 'fas fa-mouse-pointer';
+                        clickSpan.appendChild(clickIcon);
+                        const clickCountSpan = document.createElement('span');
+                        clickCountSpan.id = `click-count-${post.filename.replace(/\W/g, '-')}`;
+                        const clicks = parseInt(localStorage.getItem(`blog-clicks-${post.filename}`) || '0');
+                        clickCountSpan.textContent = ` ${clicks} clicks`;
+                        clickSpan.appendChild(clickCountSpan);
                         
                         metaDiv.appendChild(dateSpan);
                         metaDiv.appendChild(categorySpan);
+                        metaDiv.appendChild(clickSpan);
                         blogPost.appendChild(metaDiv);
 
                         // Create blog content container
@@ -613,6 +624,11 @@
                         // Add toggle functionality
                         showMoreBtn.addEventListener('click', () => {
                             blogContent.classList.remove('collapsed');
+                            // Increment click counter
+                            const clickKey = `blog-clicks-${post.filename}`;
+                            const clicks = parseInt(localStorage.getItem(clickKey) || '0') + 1;
+                            localStorage.setItem(clickKey, clicks.toString());
+                            document.getElementById(`click-count-${post.filename.replace(/\W/g, '-')}`).textContent = ` ${clicks} clicks`;
                         });
                         
                         showLessBtn.addEventListener('click', () => {
@@ -721,7 +737,7 @@
         // Load saved theme preference
         document.addEventListener('DOMContentLoaded', function() {
             const savedDarkMode = localStorage.getItem('darkMode');
-            const darkMode = savedDarkMode === null ? true : savedDarkMode === 'true';
+            const darkMode = savedDarkMode === null ? false : savedDarkMode === 'true';
             const themeToggle = document.getElementById('theme-toggle');
             const icon = themeToggle.querySelector('i');
             

@@ -635,6 +635,7 @@
             <div class="contact-info">
                 <p><i class="fas fa-envelope"></i> jiahao.chen99@gmail.com</p>
                 <p><i class="fab fa-linkedin"></i> <a href="https://www.linkedin.com/in/leighton-chen-54495461/" target="_blank">LinkedIn Profile</a></p>
+                <p><i class="fas fa-eye"></i> Page Visits: <span id="visit-counter">0</span></p>
             </div>
         </footer>
     </div>
@@ -679,6 +680,14 @@
             retina_detect: true
         });
 
+        // Visit counter functionality
+        function incrementVisitCounter() {
+            let visits = parseInt(localStorage.getItem('pageVisits') || '0');
+            visits++;
+            localStorage.setItem('pageVisits', visits.toString());
+            document.getElementById('visit-counter').textContent = visits;
+        }
+
         // Theme persistence functionality
         function setTheme(isDark) {
             if (isDark) {
@@ -695,9 +704,10 @@
 
         // Load saved theme preference
         document.addEventListener('DOMContentLoaded', function() {
+            incrementVisitCounter();
             const savedDarkMode = localStorage.getItem('darkMode');
-            // Set dark mode as default if no preference is saved
-            const darkMode = savedDarkMode === null ? true : savedDarkMode === 'false';
+            // Set light mode as default if no preference is saved
+            const darkMode = savedDarkMode === null ? false : savedDarkMode === 'true';
             setTheme(darkMode);
         });
 
