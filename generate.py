@@ -36,8 +36,8 @@ def sanitize_filename(title):
     """Convert video title to safe filename"""
     # Remove invalid filename characters
     title = re.sub(r'[<>:"/\\|?*]', '', title)
-    # Replace spaces with spaces or underscores based on preference
-    title = title.replace(' ', ' ')  # or use '_' if you prefer underscores
+    # Replace spaces with underscores for safe filenames
+    title = title.replace(' ', '_')
     # Remove any multiple spaces
     title = re.sub(r'\s+', ' ', title).strip()
     return f"{title}.md"
