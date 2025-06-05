@@ -53,5 +53,8 @@ def generate_metadata():
     # Write to blog-posts.json
     with open('blog-posts.json', 'w', encoding='utf-8') as f:
         json.dump(metadata, f, indent=4, ensure_ascii=False)
-    
+
     print(f"Generated metadata for {len(posts)} blog posts")
+
+if __name__ == "__main__":
+    generate_metadata()

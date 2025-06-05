@@ -511,7 +511,11 @@
             
             // Initialize highlight.js on code blocks
             container.querySelectorAll('pre code').forEach((block) => {
-                hljs.highlightBlock(block);
+                if (hljs.highlightElement) {
+                    hljs.highlightElement(block);
+                } else {
+                    hljs.highlightBlock(block);
+                }
             });
         }
 
